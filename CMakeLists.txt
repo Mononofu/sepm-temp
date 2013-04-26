@@ -87,11 +87,11 @@ add_custom_command(OUTPUT cert
 
 add_custom_command(OUTPUT server_cert
     POST_BUILD
-    COMMAND cmake -E copy "${CMAKE_CURRENT_SOURCE_DIR}/server.crt" "${CMAKE_BINARY_DIR}/bin/ca.crt")
+    COMMAND cmake -E copy "${CMAKE_CURRENT_SOURCE_DIR}/server.crt" "${CMAKE_BINARY_DIR}/bin/server.crt")
 
 add_custom_command(OUTPUT server_key
     POST_BUILD
-    COMMAND cmake -E copy "${CMAKE_CURRENT_SOURCE_DIR}/server.key" "${CMAKE_BINARY_DIR}/bin/ca.crt")
+    COMMAND cmake -E copy "${CMAKE_CURRENT_SOURCE_DIR}/server.key" "${CMAKE_BINARY_DIR}/bin/server.key")
 
 
 # copy executables to bin dir
