@@ -26,7 +26,7 @@ IceChat::IceChat(string pub_key_path, string priv_key_path, string ca_path) {
     ic = Ice::initialize(id);
 
     Ice::ObjectAdapterPtr oa =
-      ic->createObjectAdapterWithEndpoints("AuthenticationEndpoint", "ssl -p 1337");
+      ic->createObjectAdapterWithEndpoints("AuthenticationEndpoint", "ssl -p 8337");
     oa->add(new AuthenticationImpl(), ic->stringToIdentity("Authentication"));
     oa->activate();
     ic->waitForShutdown();
