@@ -25,7 +25,7 @@ int main(int argc, char** argv) {
 
   cout << "Hello from server" << endl;
 
-  IceChat chat("asdf.crt", "asdf.key", "ca.crt");
+  IceChat chat("server.crt", "server.key", "ca.crt");
 
   return 0;
 }
