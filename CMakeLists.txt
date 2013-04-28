@@ -115,9 +115,9 @@ add_custom_command(OUTPUT plugin_dir
     COMMAND cmake -E make_directory "${CMAKE_BINARY_DIR}/bin/plugins")
 
 
-include_directories(${CMAKE_CURRENT_SOURCE_DIR})
-include_directories(${CMAKE_CURRENT_SOURCE_DIR}/common)
-include_directories(${CMAKE_CURRENT_SOURCE_DIR}/dependencies)
+include_directories("${CMAKE_CURRENT_SOURCE_DIR}")
+include_directories("${CMAKE_CURRENT_SOURCE_DIR}/common")
+include_directories("${CMAKE_CURRENT_SOURCE_DIR}/dependencies")
 
 add_subdirectory(dependencies)
 include_directories(${CMAKE_BINARY_DIR}/dependencies/zmq/zmq-3-2-2-prefix/include)

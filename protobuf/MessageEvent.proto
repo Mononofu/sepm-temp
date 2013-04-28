@@ -11,7 +11,7 @@ message MessageEvent {
 
   // for INVITE_USER
   optional string other = 4;
-  optional bytes pubkey = 5;
+  optional bytes session_key = 5;
 
   // for SEND_MESSAGE
   optional bytes msg = 6;

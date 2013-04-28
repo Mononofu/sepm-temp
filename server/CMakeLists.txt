@@ -1,4 +1,4 @@
-add_executable(server server.cpp backward.cpp Ice.cpp AuthenticationImpl.cpp SessionImpl.cpp SocketHandler.cpp ${out_file} ${copy_deps})
+add_executable(server server.cpp backward.cpp Ice.cpp AuthenticationImpl.cpp SessionImpl.cpp SocketHandler.cpp UserCallback.cpp ${out_file} ${copy_deps})
 
 add_subdirectory(auth)
 

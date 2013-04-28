@@ -1,6 +1,7 @@
 #include "AuthenticationImpl.h"
 #include "AuthMsg.pb.h"
 #include "SocketHandler.h"
+#include "UserCallback.h"
 
 void AuthenticationImpl::registerUser(const sdc::User &u, const string &pw,
   const Ice::Current&) {
@@ -28,6 +29,7 @@ sdc::SessionIPrx AuthenticationImpl::login(const sdc::User &user, const string &
     sdc::ChatClientCallbackIPrx callback = sdc::ChatClientCallbackIPrx::checkedCast(proxy);
     if(callback->echo("42") == "42") {
       Ice::ObjectPrx prx = this->chat->createAdapter(new SessionImpl(user), cur.con);
+      UserCallback::setCallback(user.ID, callback);
       cout << "Login successful" << endl;
       return sdc::SessionIPrx::checkedCast(prx);
     }

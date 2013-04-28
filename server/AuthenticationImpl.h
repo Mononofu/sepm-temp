@@ -1,3 +1,6 @@
+#ifndef AUTHENTIcATION_IMPL_H
+#define AUTHENTIcATION_IMPL_H
+
 #include "SecureDistributedChat.h"
 #include "SessionImpl.h"
 #include "Ice.h"
@@ -13,3 +16,5 @@ public:
 private:
   IceChat *chat;
 };
+
+#endif

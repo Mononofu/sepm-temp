@@ -2,6 +2,7 @@
 #include "AuthMsg.pb.h"
 #include "SocketHandler.h"
 #include "MessageEvent.pb.h"
+#include <IceUtil/IceUtil.h>
 
 SessionImpl::SessionImpl(sdc::User u) : user(u) {
 
@@ -13,6 +14,28 @@ void SessionImpl::logout(const Ice::Current&) {
   msg.set_id(user.ID);
 
   SocketHandler::send_auth(msg);
+}
+
+
+void SessionImpl::deleteUser(const sdc::User &user, const Ice::Current&) {
+  AuthMsg msg;
+  msg.set_action(AuthMsg::DELETE);
+  msg.set_id(user.ID);
+
+  SocketHandler::send_auth(msg);
+}
+
+string SessionImpl::initChat(const Ice::Current&) {
+  string chat = IceUtil::generateUUID();
+
+  MessageEvent msg;
+  msg.set_action(MessageEvent::INIT_CHAT);
+  msg.set_user(user.ID);
+  msg.set_chat(chat);
+
+  SocketHandler::send_msg(msg);
+
+  return chat;
 }
 
 void SessionImpl::leaveChat(const string &chat, const Ice::Current&) {
@@ -34,8 +57,8 @@ void SessionImpl::invite(const sdc::User &other, const string &chat,
 
   msg.set_other(other.ID);
 
-  std::string pubkey(key.begin(), key.end());
-  msg.set_pubkey(pubkey);
+  std::string session_key(key.begin(), key.end());
+  msg.set_session_key(session_key);
 
   SocketHandler::send_msg(msg);
 }
@@ -51,4 +74,5 @@ void SessionImpl::sendMessage(const sdc::ByteSeq &msg, const string &chat,
   msgE.set_msg(msgstr);
 
   SocketHandler::send_msg(msgE);
+  cout << "message sent" << endl;
 }

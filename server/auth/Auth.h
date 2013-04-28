@@ -3,6 +3,9 @@
 
 #include "zmqpp/zmqpp.hpp"
 #include <boost/thread.hpp>
+#include <map>
+
+using namespace std;
 
 class Auth {
 public:
@@ -14,6 +17,8 @@ private:
   zmqpp::context *context;
   boost::thread *my_thread;
   zmqpp::socket *auth_rep_sock;
+  zmqpp::socket *msg_sock;
+  map<string, string> users; // username <-> pubkey
 };
 
 #endif

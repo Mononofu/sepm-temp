@@ -22,9 +22,9 @@ IceChat::IceChat(string pub_key_path, string priv_key_path, string ca_path) {
     // necessary so invalid connections will time out
     props->setProperty("Ice.Override.ConnectTimeout", "1000");
     // enable warnings
-    props->setProperty("Ice.Warn.Connections", "1");
-    props->setProperty("Ice.Trace.Protocol", "1");
-    props->setProperty("Ice.Trace.Network", "2");
+    // props->setProperty("Ice.Warn.Connections", "1");
+    // props->setProperty("Ice.Trace.Protocol", "1");
+    // props->setProperty("Ice.Trace.Network", "2");
 
     // Initialize a communicator with these properties.
     Ice::InitializationData id;
