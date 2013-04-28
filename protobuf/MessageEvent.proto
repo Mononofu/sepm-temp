@@ -1,0 +1,18 @@
+message MessageEvent {
+  enum Action {
+    INIT_CHAT = 0;
+    LEAVE_CHAT = 1;
+    INVITE_USER = 2;
+    SEND_MESSAGE = 3;
+  }
+  required Action action = 1;
+  required string user = 2;
+  required string chat = 3;
+
+  // for INVITE_USER
+  optional string other = 4;
+  optional bytes pubkey = 5;
+
+  // for SEND_MESSAGE
+  optional bytes msg = 6;
+}

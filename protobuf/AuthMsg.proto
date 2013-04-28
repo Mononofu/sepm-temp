@@ -1,0 +1,12 @@
+message AuthMsg {
+  enum Action {
+    REGISTER = 0;
+    LOGIN = 1;
+    LOGOUT = 2;
+    DELETE = 3;
+  }
+  required Action action = 1;
+  required string id = 2;
+  optional string pw = 3;
+  optional bytes pubkey = 4;
+}

@@ -7,6 +7,8 @@
 #include "PluginManager.h"
 #include "zmqpp/zmqpp.hpp"
 #include <QtConcurrentRun>
+#include "Chat.h"
+#include <vector>
 
 namespace po = boost::program_options;
 using namespace std;
@@ -81,26 +83,28 @@ int main(int argc, char** argv) {
 
     manager.listPlugins();
 
+    Chat chat("127.0.0.1", "8337", "ca.crt");
+    cout << "Reply from server: " << chat.echo("Hello world") << endl;
 
-    zmqpp::context context;
+    sdc::User u;
+    u.ID = "mononofu";
+    u.publicKey = std::vector<Ice::Byte>();
 
-    zmqpp::socket message_source(context, zmqpp::socket_type::sub);
-    message_source.connect("tcp://127.0.0.1:5555");
-    message_source.subscribe("");
+    chat.registerUser(u, "secret");
 
-    zmqpp::socket message_sink(context, zmqpp::socket_type::pub);
-    message_sink.connect("tcp://127.0.0.1:5556");
+    cout << "try login" << endl;
+    sdc::SessionIPrx session = chat.login(u, "secret");
 
-    MessageReader reader(&message_source);
+    string chatID = session->initChat();
 
-    string line;
-
-    while(true) {
-      getline(cin, line);
-      if(cin.eof())
-        break;
-      message_sink.send(line);
+    string in;
+    while(in != "exit") {
+      cin >> in;
+      std::vector<Ice::Byte> msg(in.begin(), in.end());
+      session->sendMessage(msg, chatID);
     }
+
+    session->logout();
 
   } catch(PluginException ex) {
     cerr << ex.what() << endl;

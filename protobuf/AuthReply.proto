@@ -1,0 +1,8 @@
+message AuthReply {
+  enum Status {
+    SUCCESS = 0;
+    WRONG_PW = 1;
+    UNKNOWN_USER = 2;
+  }
+  required Status status = 1;
+}

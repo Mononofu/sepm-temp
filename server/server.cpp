@@ -4,6 +4,9 @@
 #include "zmqpp/zmqpp.hpp"
 #include "SecureDistributedChat.h"
 #include "Ice.h"
+#include "SocketHandler.h"
+
+#include "auth/Auth.h"
 
 namespace po = boost::program_options;
 using namespace std;
@@ -25,7 +28,18 @@ int main(int argc, char** argv) {
 
   cout << "Hello from server" << endl;
 
+  zmqpp::context context;
+  Auth auth(&context);
+  SocketHandler::context = &context;
+
   IceChat chat("server.crt", "server.key", "ca.crt");
+
+
+  string wait;
+  cin >> wait;
+  cout << "Exiting" << endl;
+
+  chat.stop();
 
   return 0;
 }
