@@ -9,6 +9,7 @@
 #include <QtConcurrentRun>
 #include "Chat.h"
 #include <vector>
+#include "Security.h"
 
 namespace po = boost::program_options;
 using namespace std;
@@ -83,17 +84,38 @@ int main(int argc, char** argv) {
 
     manager.listPlugins();
 
-    Chat chat("127.0.0.1", "8337", "ca.crt");
+    Chat chat("selinux.inso.tuwien.ac.at", "1337", "ca.crt");
     cout << "Reply from server: " << chat.echo("Hello world") << endl;
 
-    sdc::User u;
-    u.ID = "mononofu";
-    u.publicKey = std::vector<Ice::Byte>();
+    sdc::Security sec;
+    // sdc::ByteSeq pubkey, privkey;
+    // sec.genRSAKey(pubkey, privkey);
+    // sec.savePrivKey(privkey, "privkey");
+    // sec.savePubKey(pubkey, "pubkey");
 
-    chat.registerUser(u, "secret");
+    auto myPubKey = sec.readPubKey("pubkey");
+    auto myPrivKey = sec.readPrivKey("privkey");
+
+
+    // string dump_key(pubkey.begin(), pubkey.end());
+    // cout << dump_key << endl;
+
+    sdc::User u;
+    u.ID = "mononofu2@selinux.inso.tuwien.ac.at";
+    u.publicKey = myPubKey;
+
+    // chat.registerUser(u, "secret");
 
     cout << "try login" << endl;
     sdc::SessionIPrx session = chat.login(u, "secret");
+
+    auto user = session->retrieveUser("mononofu2@selinux.inso.tuwien.ac.at");
+    string dump_key2(user.publicKey.begin(), user.publicKey.end());
+    cout << dump_key2 << endl;
+
+    auto decryptedKey = sec.decryptRSA(myPrivKey, user.publicKey);
+    string dump_key3(decryptedKey.begin(), decryptedKey.end());
+    cout << dump_key3 << endl;
 
     string chatID = session->initChat();
 
