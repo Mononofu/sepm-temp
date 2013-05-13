@@ -32,7 +32,13 @@ public:
 int main(int argc, char** argv) {
   po::options_description desc("Allowed options");
   desc.add_options()
+    ("register,r", "register a new account")
     ("help,h", "produce help message")
+    ("user,u", po::value<string>(), "choose username")
+    ("password,p", po::value<string>(), "choose password")
+    ("server,s", po::value<string>(), "choose server")
+    ("dump,d", "dump key from server")
+    ("retrieve", po::value<string>(), "retrieve a given user from server")
   ;
 
   po::variables_map vm;
@@ -49,28 +55,6 @@ int main(int argc, char** argv) {
 
   try {
 
-    ViewRefresher refresher;
-    FileWatcher watcher("./ui", boost::bind(&ViewRefresher::fileChanged, &refresher, _1, _2, _3));
-
-    // create or modify a file in ./ui to see the changes getting picked up
-    FileWatcher demo("./ui", [](string name, bool isDir, FileWatcher::FileEvent e) {
-      switch(e) {
-        case FileWatcher::CREATE:
-          cout << "created ";
-          break;
-        case FileWatcher::MODIFY:
-          cout << "modified ";
-          break;
-        case FileWatcher::DELETE:
-          cout << "deleted ";
-          break;
-        default:
-          cout << "unknown event: ";
-      }
-      cout << (isDir ? "dir " : "file ");
-      cout << name << endl;
-    });
-
     ExitHandler::i()->setHandler([](int) {
       // called when SIGINT (eg by Ctrl+C) is received
       // do cleanup
@@ -80,11 +64,9 @@ int main(int argc, char** argv) {
       cout << " Got signal .. terminating" << endl;
     });
 
-    PluginManager manager;
 
-    manager.listPlugins();
-
-    Chat chat("selinux.inso.tuwien.ac.at", "1337", "ca.crt");
+    string server = vm.count("server") ? vm["server"].as<string>() : "selinux.inso.tuwien.ac.at";
+    Chat chat(server, "1337", "ca.crt");
     cout << "Reply from server: " << chat.echo("Hello world") << endl;
 
     sdc::Security sec;
@@ -97,25 +79,40 @@ int main(int argc, char** argv) {
     auto myPrivKey = sec.readPrivKey("privkey");
 
 
+    if(vm.count("retrieve")) {
+      string target = vm["retrieve"].as<string>();
+      cout << "retrieving user " << target << endl;
+      auto retrievedUser = chat.inter->retrieveUser(target);
+      cout << retrievedUser.ID << endl;
+      string dump_key2(retrievedUser.publicKey.begin(), retrievedUser.publicKey.end());
+      cout << dump_key2 << endl;
+    }
+
     // string dump_key(pubkey.begin(), pubkey.end());
     // cout << dump_key << endl;
 
+    string username = vm.count("username") ? vm["username"].as<string>() : "mononofu";
+    string password = vm.count("password") ? vm["password"].as<string>() : "secret";
+
     sdc::User u;
-    u.ID = "mononofu2@selinux.inso.tuwien.ac.at";
+    u.ID = username + "@selinux.inso.tuwien.ac.at";
     u.publicKey = myPubKey;
 
-    // chat.registerUser(u, "secret");
+    if(vm.count("register")) {
+      cout << "registering" << endl;
+      chat.registerUser(u, password);
+    }
 
     cout << "try login" << endl;
-    sdc::SessionIPrx session = chat.login(u, "secret");
+    sdc::SessionIPrx session = chat.login(u, password);
 
-    auto user = session->retrieveUser("mononofu2@selinux.inso.tuwien.ac.at");
-    string dump_key2(user.publicKey.begin(), user.publicKey.end());
-    cout << dump_key2 << endl;
+    if(vm.count("dump")) {
+      cout << "duming key" << endl;
+      auto user = session->retrieveUser(u.ID);
+      string dump_key2(user.publicKey.begin(), user.publicKey.end());
+      cout << dump_key2 << endl;
+    }
 
-    auto decryptedKey = sec.decryptRSA(myPrivKey, user.publicKey);
-    string dump_key3(decryptedKey.begin(), decryptedKey.end());
-    cout << dump_key3 << endl;
 
     string chatID = session->initChat();
 

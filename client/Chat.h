@@ -16,6 +16,7 @@ public:
   // constructor tries to set up connection to server, throws if it fails
   Chat(string server, string port, string cert_path) {
     boost::format connection_string = boost::format("Authentication:ssl -h %1% -p %2%");
+    boost::format interserver_string = boost::format("InterServer:ssl -h %1% -p %2%");
     int argc = 1;
     char prog_name[] = "sdc_client";
     char *argv[] = { prog_name };
@@ -44,6 +45,11 @@ public:
 
       auth = sdc::AuthenticationIPrx::checkedCast(base);
 
+
+      Ice::ObjectPrx interBase = ic->stringToProxy(
+        (interserver_string % server % port).str() );
+
+      inter = sdc::InterServerIPrx::checkedCast(interBase);
 
       /* create callback interface */
       Ice::ObjectAdapterPtr adapter = ic->createObjectAdapter("");
@@ -77,7 +83,7 @@ public:
     return auth->login(u, pw, callback_ident);
   }
 
-private:
+  sdc::InterServerIPrx inter;
   Ice::CommunicatorPtr ic;
   sdc::AuthenticationIPrx auth;
   Ice::Identity callback_ident;
